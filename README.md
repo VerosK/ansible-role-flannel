@@ -3,6 +3,6 @@
 
 Tested on CentOS 7. 
 
-Sponsored by "TeamGuru":[teamguru]
+Sponsored by (TeamGuru)[teamguru]
 
 [teamguru]: https://teamguru.com
