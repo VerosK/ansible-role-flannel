@@ -1,0 +1,37 @@
+- name: Install flannel
+  yum:
+    name: flannel
+    state: installed
+
+- name: Install etcdctl
+  yum:
+    name: etcd
+    state: installed
+
+- file:
+    path: /etc/systemd/system/flanneld.service.d
+    state: directory
+
+- name: Add Flannel network config to etcdctl
+  copy:
+    dest: /etc/systemd/system/flanneld.service.d/10-create-key.conf
+    content: |
+      [Service]
+      ExecStartPre=/usr/bin/etcdctl -C ${FLANNEL_ETCD_ENDPOINTS} set ${FLANNEL_ETCD_PREFIX}/config '{ "Network": "{{ flannel_network }}" }'
+  notify: systemd daemon-reload
+
+- meta: flush_handlers
+
+- name: Setup flannel config files
+  copy:
+    content: '{{ item.content }}'
+    dest: '{{ item.name }}'
+    backup: true
+  with_items: '{{ flannel_configs }}'
+  notify: Restart flanneld
+
+- name: Start flanneld
+  service:
+    name: flanneld
+    state: '{{ flanneld_service_state }}'
+    enabled: '{{ flanneld_service_enabled }}'

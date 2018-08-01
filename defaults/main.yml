@@ -1,0 +1,29 @@
+
+# should we start flanneld
+flanneld_service_state: started
+flanneld_service_enabled: true
+flanneld_etcd_key: '/flannel/network'
+
+flannel_etcd: 'http://127.0.0.1:2379'
+flannel_network: '10.11.0.0/16'
+
+flannel_interface: eth0
+
+flannel_options:
+    "--iface={{flannel_interface}} --public-ip={{ ansible_eth0.ipv4.address }} --ip-masq"
+
+#flannel_configs: []
+flannel_configs:
+  - name: /etc/sysconfig/flanneld
+    content: |
+        #Flanneld configuration options
+
+        # etcd url location.  Point this to the server where etcd runs
+        FLANNEL_ETCD_ENDPOINTS="{{ flannel_etcd }}"
+
+        # etcd config key.  This is the configuration key that flannel queries
+        # For address range assignment
+        FLANNEL_ETCD_PREFIX="{{ flanneld_etcd_key }}"
+
+        # Any additional options that you want to pass
+        FLANNEL_OPTIONS="{{ flannel_options }}"
